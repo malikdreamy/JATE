@@ -2,7 +2,7 @@
 
 ## Description
 
-Jate is PWA text-editor. It is installable on your mobile device and your desktop. 
+Jate is a PWA text-editor. It is installable on your desktop from the Chrome Browser. It is also installable on any modern mobile devices.
 
 ## Installation
 
