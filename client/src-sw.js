@@ -1,30 +1,64 @@
-const { offlineFallback, warmStrategyCache } = require('workbox-recipes');
-const { CacheFirst } = require('workbox-strategies');
-const { registerRoute } = require('workbox-routing');
-const { CacheableResponsePlugin } = require('workbox-cacheable-response');
-const { ExpirationPlugin } = require('workbox-expiration');
-const { precacheAndRoute } = require('workbox-precaching/precacheAndRoute');
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.2.4/workbox-sw.js');
 
-precacheAndRoute(self.__WB_MANIFEST);
+const cacheName = 'v1';
+const cacheAssets = [
+    'index.html',
+     '/src/js/editor.js',
+     '/src/js/header.js',
+     'src/js/index.js',
+     'src/js/install.js',
+     'src/css/style.css',
+     'src/images/logo.png',
+     'src/js/database.js'
+]
 
-const pageCache = new CacheFirst({
-  cacheName: 'page-cache',
-  plugins: [
-    new CacheableResponsePlugin({
-      statuses: [0, 200],
-    }),
-    new ExpirationPlugin({
-      maxAgeSeconds: 30 * 24 * 60 * 60,
-    }),
-  ],
+
+self.addEventListener('install', (e)=>{
+console.log('Service Worker Installed')
+e.waitUntil(
+    caches.open(cacheName)
+    .then(cache => {
+        console.log('Service Worker: Caching Files');
+        cache.addAll(cacheAssets)
+        .then(()=>{
+            self.skipWaiting()
+        })
+    })
+)
 });
 
-warmStrategyCache({
-  urls: ['/index.html', '/'],
-  strategy: pageCache,
+self.addEventListener('active', (e)=>{
+    console.log('Service Worker Activated')
+    //remove unwanted caches
+    e.waitUntil(
+        caches.keys().then(cacheNames =>{
+            return Promise.all(
+                cacheNames.map(cache =>{
+                    if(cache !== cacheName){
+                        console.log('Service Worker: Clearing Old Cache')
+                        return caches.delete(cache)
+                    }
+                })
+            )
+        })
+    )
+    });
+
+self.addEventListener('fetch', e => {
+    console.log('Service Worker: Fetching');
+    e.respondWith(
+        fetch(e.request)
+        .then(res =>{
+            const resClone = res.clone();
+            caches
+            .open(cacheName)
+            .then(cache =>{
+                cache.put(e.request, resClone);
+            });
+            return res;
+        }).catch(err=> caches.match(e.request).then(res => res))
+    );     
 });
 
-registerRoute(({ request }) => request.mode === 'navigate', pageCache);
 
-// TODO: Implement asset caching
-registerRoute();
+self.__WB_MANIFEST = [...cacheAssets, {url: 'workbox-v6.2.4/workbox-sw.js', revision: null}];
