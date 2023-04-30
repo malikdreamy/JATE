@@ -6,7 +6,7 @@ Jate is PWA text-editor. It is installable on your mobile device and your deskto
 
 ## Installation
 
-After going to https://jate-editor-text.herokuapp.com/ press the install button and it will be installed on your machine
+After going to https://jate-editor-text.herokuapp.com/ on the Chrome Browser press the install button and it will be installed on your machine
 
 ## Usage
 
