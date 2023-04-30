@@ -1,6 +1,5 @@
-import { Workbox } from 'workbox-window';
-import Editor from './editor';
-import './database';
+
+import Editor from './editor.js';
 import '../css/style.css';
 
 const main = document.querySelector('#main');
@@ -25,9 +24,14 @@ if (typeof editor === 'undefined') {
 
 // Check if service workers are supported
 if ('serviceWorker' in navigator) {
-  // register workbox service worker
-  const workboxSW = new Workbox('/src-sw.js');
-  workboxSW.register();
+  console.log('service worker supported');
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker
+    .register('/sw.js')
+    .then(reg=> console.log('Service Worker: Registered'))
+    .catch(err => console.log(`Service Worker: Error ${err}`))
+  })
+
 } else {
   console.error('Service workers are not supported in this browser.');
 }
