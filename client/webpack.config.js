@@ -19,7 +19,7 @@ module.exports = () => {
     plugins: [
       new HtmlWebpackPlugin({
         template: './index.html',
-  title: 'TODOs List',
+  title: 'JATE',
   inject: 'head',
   filename: 'index.html',
   favicon: 'favicon.ico',
